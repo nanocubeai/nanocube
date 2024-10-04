@@ -36,11 +36,11 @@ for i in range(1000):
 ### Lightning fast - really?
 For aggregated point queries NanoCube is 100x to 1,000x times faster than Pandas. For the special purpose,
 NanoCube is also much faster than all other libraries, like Spark, Polars, Modin, Dask or Vaex. If such 
-libraries are drop-in replacements with Pandas dataframe, you should be able to use them with NanoCube too. 
+libraries are drop-in replacements with Pandas dataframe, you should be able to accelerate them with NanoCube too. 
 
 ### How is this possible?
 NanoCube uses a different approach. Roaring Bitmaps (https://roaringbitmap.org) are used to construct 
-a multi-dimensional in-memory presentation of a DataFrame. For each unique value in a column, a bitmap is created
+a multi-dimensional in-memory representation of a DataFrame. For each unique value in a column, a bitmap is created
 that represents the rows in the DataFrame where this value occurs. The bitmaps are then combined to identify the 
 rows relevant for a specific point query. Numpy is finally used for aggregation of results. 
 NanoCube is a by-product of the CubedPandas project (https://github.com/Zeutschler/cubedpandas) and the result
