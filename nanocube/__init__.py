@@ -6,13 +6,12 @@ from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_float_dtype
 from pyroaring import BitMap
 
 __author__ = "Thomas Zeutschler"
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 __license__ = "MIT"
 VERSION = __version__
 
 __all__ = [
     "Cube",
-    "CubeAccessor"
 ]
 
 
@@ -88,48 +87,3 @@ class Cube:
         elif len(args) == 1: # return total as scalar
             return np.sum(self.values[self.measures[args[0]]][records] if records else self.values[self.measures[args[0]]]).item()
         return [np.sum(self.values[self.measures[a]][records] if records else self.values[self.measures[a]]).item() for a in args] # return totals as a list
-
-
-@pd.api.extensions.register_dataframe_accessor("nanocube")
-class CubeAccessor:
-    """
-    A Pandas extension that provides the NanoCube 'cube' accessor for Pandas dataframes.
-    """
-    def __init__(self, df):
-        self._df: pd.DataFrame = df
-
-    @property
-    def cube(self, dimensions: list | None = None, measures:list | None = None):
-        """
-        Initialize an in-memory OLAP cube for fast point queries upon a Pandas DataFrame.
-        By default, all non-numeric columns will be used as dimensions and all numeric columns as measures if
-        not specified otherwise. All column names need to be Python-keyword-compliant. Roaring Bitmaps
-        (https://roaringbitmap.org) are used to store and query records, Numpy is used for aggregations.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            The DataFrame to be converted to a Cube.
-        dimensions : list | None
-            (optional) The list of column names from the Pandas DataFrame to be used as dimensions.
-        measures : list | None
-            (optional) The list of columns names from the Pandas DataFrame to be used as measures.
-
-        Examples
-        --------
-        >>> import pandas as pd
-        >>> from nanocube import Cube
-        >>> # Create a DataFrame
-        >>> df = pd.DataFrame({'customer': [ 'A',  'B',  'A',  'B',  'A'],
-        >>>                    'product':  ['P1', 'P2', 'P3', 'P1', 'P2'],
-        >>>                    'promo':    [True, False, True, True, False],
-        >>>                    'sales':    [ 100,  200,  300,  400,  500],
-        >>>                    'cost':     [  60,   90,  120,  200,  240]})
-        >>> # Convert to a Cube
-        >>> cube = Cube(df)
-        >>> print(cube.get(customer='A', product='P1'))  # [100, 60]
-        >>> print(cube.get(customer='A'))                # [900, 420]
-        >>> print(cube.get(promo=True))                  # [800, 380]
-        >>> print(cube.get(promo=True))                  # [800, 380]
-        """
-        return Cube(df=self._df, dimensions=dimensions, measures=measures)
