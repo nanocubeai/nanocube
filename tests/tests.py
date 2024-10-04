@@ -4,7 +4,6 @@ import unittest
 import pandas as pd
 from nanocube import Cube
 
-
 class TestNanoCube(unittest.TestCase):
 
     def setUp(self):
