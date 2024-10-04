@@ -49,14 +49,6 @@ of the attempt to make OLAP-style queries on Pandas DataFrames as fast as possib
 ### What price do I need to pay?
 First of all, NanoCube is free and MIT licensed. The first price you need to pay is the memory consumption, typically
 up to 25% on top of the original DataFrame size. The second price is the time needed to initialize the cube, which is
-mainly proportional to the number of unique values over all dimension columns in the DataFrame. Try the included samples
-`sample.py` or notebook to get a feeling for the performance of NanoCube.
-
-
-
-
-
-
-(100x to 1000x times faster than Pandas). By default, all non-numeric columns will be
-used as dimensions and all numeric columns as measures. Roaring Bitmaps (https://roaringbitmap.org) are used
-to construct and query a multi-dimensional cube, Numpy is used for aggregations.
+mainly proportional to the number of unique values over all dimension columns in the DataFrame. Try and adapt the 
+included sample [`sample.py`](sample.py) and benchmarks [`benchmark.py`](benchmark.py) and [`benchmark.ipynb`](benchmark.ipynb) 
+to see the performance of the NanoCube approach.
