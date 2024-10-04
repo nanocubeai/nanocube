@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nanocube"
+description = "Lightning fast OLAP-style point queries on Pandas DataFrames."
+keywords = ['python', 'pandas', 'numpy', 'spark', 'data analysis', 'OLAP', 'cube', 'dataframe', ]
+classifiers = [
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development",
+    "Topic :: Scientific/Engineering",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Operating System :: MacOS",
+]
+readme = "README.md"
+dynamic = ["version"]
+license = {file = "LICENSE"}
+requires-python = ">= 3.9"
+authors = [
+  {name = "Thomas Zeutschler"},
+  {email = "cubedpandas@gmail.com"},
+]
+maintainers = [
+    {name = "Thomas Zeutschler", email="cubedpandas@gmail.com"},
+]
+dependencies = [
+    "numpy",
+    "pandas",
+    "pyroaring"
+]
+
+[project.urls]
+Homepage = "https://github.com/Zeutschler/nanocube"
+Documentation = "https://github.com/Zeutschler/nanocube"
+Repository = "https://github.com/Zeutschler/nanocube.git"
+Issues = "https://github.com/Zeutschler/nanocube/issues"
+pypi = "https://pypi.org/project/nanocube/"
+
+[tool.setuptools]
+packages = ["nanocube", "tests"]
+
+[tool.setuptools.dynamic]
+version = {attr = "nanocube.__version__"}

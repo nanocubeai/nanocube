@@ -1,0 +1,10 @@
+# nanocube - Copyright (c)2024, Thomas Zeutschler, MIT license
+numpy
+pandas
+pyroaring
+
+# for deployment
+build
+wheel
+twine
+pytest
