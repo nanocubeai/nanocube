@@ -1,6 +1,6 @@
 # (c) 2024 by Thomas Zeutschler, MIT License
 import pandas as pd
-from nanocube.__init__ import Cube
+from nanocube import Cube
 
 # Create or load a DataFrame
 df = pd.DataFrame({'customer': [ 'A',  'B',  'A',  'B',  'A'],
