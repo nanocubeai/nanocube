@@ -57,7 +57,7 @@ mainly proportional to the number of unique values over all dimension columns in
 included sample [`sample.py`](sample.py) and benchmarks [`benchmark.py`](benchmark.py) and [`benchmark.ipynb`](benchmark.ipynb) 
 to see the performance of the NanoCube approach.
 
-### Bechmarks
+## NanoCube Benchmarks
 
 Using the Python script [benchmark_ext.py](benchmark_ext.py), the following comparison charts can be created.
 The data set contains 7 dimenion columns and 2 measure columns.
