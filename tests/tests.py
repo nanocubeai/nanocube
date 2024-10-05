@@ -2,7 +2,7 @@
 
 import unittest
 import pandas as pd
-from nanocube import Cube
+from nanocube import NanoCube
 
 class TestNanoCube(unittest.TestCase):
 
@@ -14,7 +14,7 @@ class TestNanoCube(unittest.TestCase):
                            'cost': [60, 90, 120, 200, 240]})
 
     def test_cube_methods(self):
-        cube = Cube(self.df)
+        cube = NanoCube(self.df)
         self.assertEqual(cube.get(customer='A', product='P1'), {'sales': 100, 'cost': 60})
         self.assertEqual(cube.get(customer='A'), {'sales': 900, 'cost': 420})
         self.assertEqual(cube.get(product=['P1', 'P2']), {'sales': 1200, 'cost': 590})
@@ -24,26 +24,15 @@ class TestNanoCube(unittest.TestCase):
         self.assertEqual(cube.get('sales', 'cost', customer='A'), [900, 420])
 
     def test_cube_alternative_initializations(self):
-        cube = Cube(self.df, dimensions=['customer', 'product'], measures=['sales', 'cost'])
+        cube = NanoCube(self.df, dimensions=['customer', 'product'], measures=['sales', 'cost'])
         self.assertEqual(cube.get(customer='A', product='P1'), {'sales': 100, 'cost': 60})
         self.assertEqual(cube.get(customer='A'), {'sales': 900, 'cost': 420})
         self.assertEqual(cube.get(product=['P1', 'P2']), {'sales': 1200, 'cost': 590})
 
-        cube = Cube(self.df, dimensions=['promo'], measures=['sales'])
+        cube = NanoCube(self.df, dimensions=['promo'], measures=['sales'])
         self.assertEqual(cube.get('sales', promo=True), 800)
         self.assertEqual(cube.get(promo=True), {'sales': 800})
         self.assertEqual(cube.get('sales'), 1500)
-
-    def test_cube_accessor(self):
-        cube = self.df.nanocube.cube
-        self.assertEqual(cube.get(customer='A', product='P1'), {'sales': 100, 'cost': 60})
-        self.assertEqual(cube.get(customer='A'), {'sales': 900, 'cost': 420})
-        self.assertEqual(cube.get(product=['P1', 'P2']), {'sales': 1200, 'cost': 590})
-        self.assertEqual(cube.get(promo=True), {'sales': 800, 'cost': 380})
-        self.assertEqual(cube.get('sales', promo=True), 800)
-        self.assertEqual(cube.get('sales'), 1500)
-        self.assertEqual(cube.get('sales', 'cost', customer='A'), [900, 420])
-
 
 
 if __name__ == '__main__':

@@ -6,16 +6,16 @@ from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_float_dtype
 from pyroaring import BitMap
 
 __author__ = "Thomas Zeutschler"
-__version__ = "0.1.1"
+__version__ = "0.1.2"
 __license__ = "MIT"
 VERSION = __version__
 
 __all__ = [
-    "Cube",
+    "NanoCube",
 ]
 
 
-class Cube:
+class NanoCube:
     """
     A super minimalistic (27 lines of code) in-memory OLAP cube implementation for lightning fast point queries
     upon Pandas DataFrames (100x to 1000x times faster than Pandas). By default, all non-numeric columns will be
@@ -41,7 +41,7 @@ class Cube:
         Examples
         --------
         >>> import pandas as pd
-        >>> from nanocube import Cube
+        >>> from nanocube import NanoCube
         >>> # Create a DataFrame
         >>> df = pd.DataFrame({'customer': [ 'A',  'B',  'A',  'B',  'A'],
         >>>                    'product':  ['P1', 'P2', 'P3', 'P1', 'P2'],
@@ -49,7 +49,7 @@ class Cube:
         >>>                    'sales':    [ 100,  200,  300,  400,  500],
         >>>                    'cost':     [  60,   90,  120,  200,  240]})
         >>> # Convert to a Cube
-        >>> cube = Cube(df)
+        >>> cube = NanoCube(df)
         >>> print(cube.get(customer='A', product='P1'))  # [100, 60]
         >>> print(cube.get(customer='A'))                # [900, 420]
         >>> print(cube.get(promo=True))                  # [800, 380]

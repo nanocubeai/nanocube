@@ -1,6 +1,6 @@
 # (c) 2024 by Thomas Zeutschler, MIT License
 import pandas as pd
-from nanocube import Cube
+from nanocube import NanoCube
 
 # Create or load a DataFrame
 df = pd.DataFrame({'customer': [ 'A',  'B',  'A',  'B',  'A'],
@@ -10,7 +10,7 @@ df = pd.DataFrame({'customer': [ 'A',  'B',  'A',  'B',  'A'],
                    'cost':     [  60,   90,  120,  200,  240]})
 
 # Create a cube and query it
-cube = Cube(df)
+cube = NanoCube(df)
 print(cube.get(customer='A', product='P1'))  # {sales: 100, cost: 60}
 print(cube.get(customer='A'))                # {sales: 900, cost: 420}
 print(cube.get(product=['P1', 'P2']))        # {sales: 1200, cost: 590}
