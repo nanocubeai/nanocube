@@ -32,7 +32,8 @@ df = pd.read_csv('sale_data.csv')
 value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['engine'] == 'hybrid')]['revenue'].sum()
 
 # create a NanoCube and run sum aggregated point queries
-nc = NanoCube(df)
+# Declare the column supposed to be aggregated in `measures` and filtered in `dimensions`
+nc = NanoCube(df, dimensions=["make", "engine"], measures=["revenue"])
 for i in range(1000):
     value = nc.get('revenue', make=['Audi', 'BMW'], engine='hybrid')
 ```
