@@ -6,7 +6,7 @@ from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_float_dtype
 from pyroaring import BitMap
 
 __author__ = "Thomas Zeutschler"
-__version__ = "0.1.3"
+__version__ = "0.1.4"
 __license__ = "MIT"
 VERSION = __version__
 
@@ -62,7 +62,10 @@ class NanoCube:
         self.values: list = [df[c].values for c in self.measures.keys()]  # value vectors (references only)
         self.bitmaps: list = []  # bitmaps per dimension per member containing the row ids of the DataFrame
         for col in self.dimensions.keys():
-            members, records = np.unique(df[col], return_inverse=True)
+            try:
+                members, records = np.unique(df[col], return_inverse=True)
+            except TypeError:
+                members, records = np.unique(df[col].replace({None: ""}), return_inverse=True)
             self.bitmaps.append(dict([(m, BitMap(np.where(records == i)[0])) for i, m in enumerate(members)]))
 
     def get(self, *args, **kwargs):
