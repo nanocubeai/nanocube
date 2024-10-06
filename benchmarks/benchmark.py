@@ -26,16 +26,19 @@ class Benchmark:
                         "count": {"s": [], "m": [], "l": [], "xl": [], "hk": [] }}
 
     def generate_data(self, rows):
-        df = pd.DataFrame({'customer': random.choices(string.ascii_uppercase, weights=range(len(string.ascii_uppercase), 0, -1), k=rows),
+        #start = datetime.datetime.now()
+        #print(f"Generating DataFrame with {rows:,}rows ", end="")
+        df = pd.DataFrame({'promo':    random.choices([True, False], k=rows),
+                           'customer': random.choices(string.ascii_uppercase, weights=range(len(string.ascii_uppercase), 0, -1), k=rows),
                            'segment':  random.choices([f'S{i}' for i in range(10)], weights=range(10, 0, -1), k=rows),
                            'category': random.choices([f'C{i}' for i in range(100)], weights=range(100, 0, -1), k=rows),
                            'product':  random.choices([f'P{i}' for i in range(1000)], k=rows),
-                           'order':    random.choices([f'O{i}' for i in range(10000)], k=rows),
                            'date':     random.choices([datetime.date.today() - datetime.timedelta(days=i) for i in range(364)], k=rows),
-                           'promo':    random.choices([True, False], k=rows),
+                           'order':    random.choices([f'O{i}' for i in range(10000)], k=rows),
                            'sales':    [1 for _ in range(rows)],
                            'cost':     [1 for _ in range(rows)]})
         members = dict([(col, df[col].unique()) for col in df.columns])
+        #print(f"in {(datetime.datetime.now() - start).total_seconds():.5f} sec.")
         return df, members
 
     def run(self):
@@ -95,7 +98,7 @@ class Benchmark:
             pandas_query = f"df[" + " & ".join([f"(df['{k}'] == '{v}')" if isinstance(v, str) else f"(df['{k}'] == {v.__repr__()})" for k, v in record]) + "]['sales'].sum()"
             p_value = eval(pandas_query)
             # cube query
-            cube_query = f"cube.get('sales', " + ", ".join([f"{k}='{v}'" if isinstance(v, str) else f"{k}={v.__repr__()}" for k, v in record]) + ")"
+            cube_query = f"cube.get('sales', " + ", ".join([f"{k}='{v}'" if isinstance(v, str) else f"{k}={v.__repr__()}" for k, v in reversed(record)]) + ")"
             c_value = eval(cube_query)
 
         elif size == "m":
