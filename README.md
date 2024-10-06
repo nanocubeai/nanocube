@@ -10,9 +10,9 @@
 
 -----------------
 
-**NanoCube** is a super minimalistic, in-memory OLAP engine for lightning fast point queries
-on Pandas DataFrames. It’s just 27 lines of code that magically transform any DataFrame into a 
-multi-dimensional OLAP cube. NanoCube shines when many point queries are needed on the same DataFrame,
+**NanoCube** is a minimalistic, in-memory OLAP engine for lightning fast point queries
+on Pandas DataFrames. As of now, just 27 lines of code are required to transform a Pandas DataFrame into a 
+multi-dimensional OLAP cube. NanoCube shines when point queries need to be executed on a DataFrame,
 e.g. for financial data analysis, business intelligence or fast web services.
 
 If you believe it would be valuable to **extend NanoCube with additional OLAP features** and improve its speed - 
@@ -32,73 +32,82 @@ df = pd.read_csv('sale_data.csv')
 value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['engine'] == 'hybrid')]['revenue'].sum().item()
 
 # create a NanoCube and run sum aggregated point queries
-cube = NanoCube(df)
+nc = NanoCube(df)
 for i in range(1000):
-    value = cube.get('revenue', make=['Audi', 'BMW'], engine='hybrid')
+    value = nc.get('revenue', make=['Audi', 'BMW'], engine='hybrid')
 ```
 
+> **Tip**: Only include those columns in the NanoCube setup, that you actually want to query!
+> The more columns you include, the more memory and time is needed for initialization.
+> ```
+> df = pd.read_csv('dataframe_with_100_columns.csv')
+> nc = NanoCube(df, dimensions=['col1', 'col2'], mesaures=['col100'])
+> ```
+
 ### Lightning fast - really?
-For aggregated point queries NanoCube are up to 100x or evn 1,000x times faster than Pandas. For the special purpose,
-NanoCube is also much faster than all other libraries, like Spark, Polars, Modin, Dask or Vaex. If such 
-libraries are drop-in replacements with Pandas dataframe, you should be able to accelerate them with NanoCube too.
+For aggregated point queries NanoCube are up to 100x or even 1,000x times faster than Pandas. 
+For this special purpose, NanoCube is even faster than other DataFrame oriented libraries, 
+like Spark, Polars, Modin, Dask or Vaex. If such libraries are a drop-in replacements for Pandas,
+then you should be able to accelerate them with NanoCube too. Try it and let me know.
 
-As a rule of thump, using NanoCube is valuable for 10 or more point queries on a DataFrame, as the 
-initialization time for 50k - 200k rows/sec the NanoCube needs to be taken consideration. 
-
+NanoCube is beneficial only if multiple point queries (> 10) need to be executed, as the 
+initialization time for the NanoCube needs to be taken into consideration.
+The more point query you run, the more you benefit from NanoCube.
 
 ### How is this possible?
-NanoCube creates an in-memory multi-dimensional index over the entire dataframe using 
-Roaring Bitmaps (https://roaringbitmap.org). This takes some time, but yields very fast filtering and point queries.
+NanoCube creates an in-memory multi-dimensional index over all relevant entities/columns in a dataframe.
+Internally, Roaring Bitmaps (https://roaringbitmap.org) are used. Initialization takes some time, but 
+yields very fast filtering and point queries.
 
-For each unique value in all dimension columns, a bitmap is created that represents the rows in the DataFrame 
-where this value occurs. The bitmaps can then be combined or intersected to determine the rows relevant for 
-a specific filter or point query. Once the relevant rows are determined, Numpy is used for aggregation of results. 
+Approach: For each unique value in all relevant dimension columns, a bitmap is created that represents the 
+rows in the DataFrame where this value occurs. The bitmaps can then be combined or intersected to determine 
+the rows relevant for a specific filter or point query. Once the relevant rows are determined, Numpy is used
+then for to aggregate the requested measures. 
 
 NanoCube is a by-product of the CubedPandas project (https://github.com/Zeutschler/cubedpandas) and will be integrated
 into CubedPandas in the future. But for now, NanoCube is a standalone library that can be used with 
 any Pandas DataFrame for the special purpose of point queries.
 
 ### What price do I have to pay?
-First of all, no money. NanoCube is free and MIT licensed. But the first price you need to pay is 
-some additional memory consumption, typically up to 25% on top of the original DataFrame size. 
+NanoCube is free and MIT licensed. The prices to pay are additional memory consumption, depending on the
+use case typically 25% on top of the original DataFrame and the time needed for initializing the multidimensional
+index, typically 50k - 250k rows/sec depending on the number of columns to be indexed and your hardware. 
+The initialization time is proportional to the number of rows in the DataFrame (see below).
 
-The second price to pay, is the time needed to create the multidimensional index. The time is proportional 
-to the size of the DataFrame (see below). 
-
-Try may want to try and adapt the included sample [`sample.py`](sample.py) and benchmarks 
-[`benchmark.py`](benchmark.py) and [`benchmark.ipynb`](benchmark.ipynb) to test the behavior of NanoCube 
+You may want to try and adapt the included samples [`sample.py`](samples/sample.py) and benchmarks 
+[`benchmark.py`](benchmarks/benchmark.py) and [`benchmark.ipynb`](benchmarks/benchmark.ipynb) to test the behavior of NanoCube 
 on your data.
 
 ## NanoCube Benchmarks
 
-Using the Python script [benchmark_ext.py](benchmark_ext.py), the following comparison charts can be created.
-The data set contains 7 dimenion columns and 2 measure columns.
+Using the Python script [benchmark.py](benchmarks/benchmark.py), the following comparison charts can be created.
+The data set contains 7 dimension columns and 2 measure columns.
 
 #### Point query for single row
 A highly selective query, fully qualified and filtering on all 7 dimensions. The query will return and aggregates 1 single row.
 NanoCube is 100x or more times faster than Pandas. 
 
-![Point query for single row](charts/s.png)
+![Point query for single row](benchmarks/charts/s.png)
 
 #### Point query on high cardinality column
 A highly selective, filtering on a single high cardinality dimension, where each member
 represents ±0.01% of rows. NanoCube is 100x or more times faster than Pandas. 
 
-![Query on single high cardinality column](charts/hk.png)
+![Query on single high cardinality column](benchmarks/charts/hk.png)
 
 
 #### Point query aggregating 0.1% of rows
 A highly selective, filtering on 1 dimension that affects and aggregates 0.1% of rows.
 NanoCube is 100x or more times faster than Pandas. 
 
-![Point query aggregating 0.1% of rows](charts/m.png)
+![Point query aggregating 0.1% of rows](benchmarks/charts/m.png)
 
 #### Point query aggregating 5% of rows
 A barely selective, filtering on 2 dimensions that affects and aggregates 5% of rows.
 NanoCube is consistently 10x faster than Pandas. But you can already see, that the 
 aggregation in Numpy become slightly more dominant. 
 
-![Point query aggregating 5% of rows](charts/l.png)
+![Point query aggregating 5% of rows](benchmarks/charts/l.png)
 
 #### Point query aggregating 50% of rows
 A non-selective query, filtering on 1 dimension that affects and aggregates 50% of rows.
@@ -106,7 +115,7 @@ Here, most of the time is spent in Numpy, aggregating the rows. The more
 rows, the closer Pandas and NanoCube get as both rely on Numpy for
 aggregation.
 
-![Point query aggregating 50% of rows](charts/xl.png)
+![Point query aggregating 50% of rows](benchmarks/charts/xl.png)
 
 #### NanoCube initialization time
 The time required to initialize a NanoCube instance is linear.
@@ -115,7 +124,7 @@ Depending on the number of dimensions and the cardinality a throughput of
 data from Pandas. The initialization of the Roaring Bitmaps taken no time.
 Likely, a custom file format for NanoCube data would be highly beneficial.
 
-![NanoCube initialization time](charts/init.png)
+![NanoCube initialization time](benchmarks/charts/init.png)
 
 
 

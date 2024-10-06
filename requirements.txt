@@ -1,5 +1,5 @@
 # nanocube - Copyright (c)2024, Thomas Zeutschler, MIT license
-numpy
+numpy >= 1.24.0
 pandas
 pyroaring
 
