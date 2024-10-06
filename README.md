@@ -10,7 +10,7 @@
 
 -----------------
 
-**NanoCube** is a minimalistic, in-memory OLAP engine for lightning fast point queries
+**NanoCube** is a minimalistic in-memory, in-process OLAP engine for lightning fast point queries
 on Pandas DataFrames. As of now, just 27 lines of code are required to transform a Pandas DataFrame into a 
 multi-dimensional OLAP cube. NanoCube shines when point queries need to be executed on a DataFrame,
 e.g. for financial data analysis, business intelligence or fast web services.
@@ -29,7 +29,7 @@ from nanocube import NanoCube
 
 # create a DataFrame
 df = pd.read_csv('sale_data.csv')
-value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['engine'] == 'hybrid')]['revenue'].sum().item()
+value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['engine'] == 'hybrid')]['revenue'].sum()
 
 # create a NanoCube and run sum aggregated point queries
 nc = NanoCube(df)
@@ -41,8 +41,8 @@ for i in range(1000):
 > The more columns you include, the more memory and time is needed for initialization.
 > ```
 > df = pd.read_csv('dataframe_with_100_columns.csv')
-> nc = NanoCube(df, dimensions=['col1', 'col2'], mesaures=['col100'])
-> ```
+> nc = NanoCube(df, dimensions=['col1', 'col2'], measures=['col100'])
+> ``` 
 
 > **Tip**: Use dimensions with highest cardinality first. This yields much faster response time 
 > when more than 2 dimensions need to be filtered.
