@@ -44,6 +44,13 @@ for i in range(1000):
 > nc = NanoCube(df, dimensions=['col1', 'col2'], mesaures=['col100'])
 > ```
 
+> **Tip**: Use dimensions with highest cardinality first. This yields much faster response time 
+> when more than 2 dimensions need to be filtered.
+> ```
+> nc.get(promo=True, discount=True, customer='4711')  # bad=slower, non-selevtive columns first
+> nc.get(customer='4711', promo=True, discount=True)  # good=faster, most selective column first 
+> ```
+
 ### Lightning fast - really?
 For aggregated point queries NanoCube are up to 100x or even 1,000x times faster than Pandas. 
 For this special purpose, NanoCube is even faster than other DataFrame oriented libraries, 
