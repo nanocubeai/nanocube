@@ -4,14 +4,11 @@ import timeit
 import string
 import datetime
 import matplotlib.pyplot as plt
-import scienceplots
 
 from matplotlib import ticker
-import numpy as np
 
 import pandas as pd
-from matplotlib.lines import lineStyles
-from rfc3986.abnf_regexp import segments
+
 
 from nanocube import NanoCube
 
@@ -171,7 +168,7 @@ class Benchmark:
         ax2.set_ylabel('# of returned rows', color='steelblue')
         ax2.get_yaxis().set_major_formatter(
             ticker.FuncFormatter(lambda x, p: format(int(x), ',')))
-        ax2.legend()
+        ax2.legend(loc='lower right')
 
         # title
         plt.suptitle(title, fontsize=16)
@@ -209,5 +206,4 @@ if __name__ == "__main__":
     # run the benchmark
     b = Benchmark(max_rows=14_000_000)
     b.run()
-    print("Benchmark finished.")
-    print(b.data)
+

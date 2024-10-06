@@ -6,7 +6,7 @@ from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_float_dtype
 from pyroaring import BitMap
 
 __author__ = "Thomas Zeutschler"
-__version__ = "0.1.2"
+__version__ = "0.1.3"
 __license__ = "MIT"
 VERSION = __version__
 
@@ -55,7 +55,6 @@ class NanoCube:
         >>> print(cube.get(promo=True))                  # [800, 380]
         >>> print(cube.get(promo=True))                  # [800, 380]
         """
-        self.df = df
         measures = [c for c in df.columns if is_numeric_dtype(df[c].dtype) and not is_bool_dtype(df[c].dtype)] if measures is None else measures
         dimensions = [c for c in df.columns if not c in measures and not is_float_dtype(df[c].dtype)] if dimensions is None else dimensions
         self.dimensions:dict = dict([(col, i) for i, col in enumerate(dimensions)])
@@ -83,7 +82,7 @@ class NanoCube:
                    else self.bitmaps[d][kwargs[dim]]) for d, dim in enumerate(self.dimensions.keys()) if dim in kwargs]
         records = reduce(lambda x, y: x & y, bitmaps) if bitmaps else False
         if len(args) == 0: # return all totals as a dict
-            return dict([(c, np.sum(self.values[i][records]).item()) if records else(c, np.sum(self.values[i]).item()) for c, i in self.measures.items()])
+            return dict([(c, np.nansum(self.values[i][records]).item()) if records else(c, np.nansum(self.values[i]).item()) for c, i in self.measures.items()])
         elif len(args) == 1: # return total as scalar
-            return np.sum(self.values[self.measures[args[0]]][records] if records else self.values[self.measures[args[0]]]).item()
-        return [np.sum(self.values[self.measures[a]][records] if records else self.values[self.measures[a]]).item() for a in args] # return totals as a list
+            return np.nansum(self.values[self.measures[args[0]]][records] if records else self.values[self.measures[args[0]]]).item()
+        return [np.nansum(self.values[self.measures[a]][records] if records else self.values[self.measures[a]]).item() for a in args] # return totals as a list
