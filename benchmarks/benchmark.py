@@ -149,7 +149,6 @@ class Benchmark:
         ax.grid(True)
         ax.grid(which='minor', linestyle=':', linewidth='0.5', color='grey')
 
-
         # primary y-axis (durations)
         ax.plot(data["rows"], data["pandas"][size],
                 label=f"Pandas", color="black",
@@ -157,7 +156,8 @@ class Benchmark:
         ax.plot(data["rows"], data["cube"][size],
                 label=f"NanoCube", color="black",
                 linestyle='solid', marker=".")
-        ax.legend()
+        ax.legend(loc='upper left')
+
 
         # secondary y-axis (returned rows)
         ax2 = ax.twinx()
