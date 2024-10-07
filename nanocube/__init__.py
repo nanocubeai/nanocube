@@ -67,6 +67,7 @@ class NanoCube:
             except TypeError:
                 members, records = np.unique(df[col].replace({None: ""}), return_inverse=True)
             self.bitmaps.append(dict([(m, BitMap(np.where(records == i)[0])) for i, m in enumerate(members)]))
+        pass
 
     def get(self, *args, **kwargs):
         """

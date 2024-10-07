@@ -1,11 +1,14 @@
 from nanocube import NanoCube
+import pandas as pd
 import polars as pl
-
 from timeit import timeit
 
-# Create a DataFrame
+# Create a DataFrame and NanoCube
+df = pd.read_parquet('files/car_prices.parquet')
+ns = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'])
+
+# Create a Polars table
 df = pl.read_parquet('files/car_prices.parquet')
-ns = NanoCube(df.to_pandas(), dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'])
 
 
 def query_nanocube(loops=1000):
