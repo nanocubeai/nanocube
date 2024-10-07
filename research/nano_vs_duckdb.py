@@ -1,14 +1,16 @@
 from nanocube import NanoCube
 import polars as pl
 import duckdb
+import pandas as pd
 
 from timeit import timeit
 
-# Create a DataFrame
-df = pl.read_parquet('files/car_prices.parquet')
-ns = NanoCube(df.to_pandas(), dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'])
-ducktable = duckdb.sql("SELECT * FROM 'files/car_prices.parquet'")
+# Create a DataFrame and NanoCube
+df = pd.read_parquet('files/car_prices.parquet')
+ns = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'])
 
+# Create a DuckDB table
+duckdb.sql("CREATE TABLE car_prices AS SELECT * FROM 'files/car_prices.parquet'")
 
 
 def query_nanocube(loops=1000):
@@ -20,7 +22,7 @@ def query_nanocube(loops=1000):
 def query_duckdb(loops=1000):
     value = 0
     for _ in range(loops):
-        value += duckdb.sql("SELECT SUM(mmr) FROM ducktable WHERE model='Optima' AND trim='LX' AND make='Kia' AND body='Sedan';").fetchall()[0][0]
+        value += duckdb.sql("SELECT SUM(mmr) FROM car_prices WHERE model='Optima' AND trim='LX' AND make='Kia' AND body='Sedan';").fetchall()[0][0]
     return value
 
 
