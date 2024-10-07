@@ -11,7 +11,7 @@
 -----------------
 
 **NanoCube** is a minimalistic in-memory, in-process OLAP engine for lightning fast point queries
-on Pandas DataFrames. As of now, just 27 lines of code are required to transform a Pandas DataFrame into a 
+on Pandas DataFrames. As of now, less than 50 lines of code are required to transform a Pandas DataFrame into a 
 multi-dimensional OLAP cube. NanoCube shines when point queries need to be executed on a DataFrame,
 e.g. for financial data analysis, business intelligence or fast web services.
 

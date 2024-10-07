@@ -9,7 +9,7 @@ import os
 # Create a DataFrame and NanoCube
 file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
 df = pd.read_parquet(file_car_prices)
-ns = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'])
+nc = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'], caching=False)
 
 # Connect to in-memory SQLite database
 conn = sqlite3.connect(':memory:')
@@ -22,7 +22,7 @@ if True:
 def query_nanocube(loops=1000):
     value = 0
     for _ in range(loops):
-        value += ns.get('mmr', model='Optima', trim='LX', make='Kia', body='Sedan')
+        value += nc.get('mmr', model='Optima', trim='LX', make='Kia', body='Sedan')
     return value
 
 def query_sqlite(loops=1000):
