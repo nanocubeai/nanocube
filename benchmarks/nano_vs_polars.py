@@ -2,13 +2,16 @@ from nanocube import NanoCube
 import pandas as pd
 import polars as pl
 from timeit import timeit
+from pathlib import Path
+import os
 
 # Create a DataFrame and NanoCube
-df = pd.read_parquet('files/car_prices.parquet')
+file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
+df = pd.read_parquet(file_car_prices)
 ns = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'])
 
 # Create a Polars table
-df = pl.read_parquet('files/car_prices.parquet')
+df = pl.read_parquet(file_car_prices)
 
 
 def query_nanocube(loops=1000):
