@@ -98,8 +98,8 @@ NanoCube is 100x or more times faster than Pandas.
 ![Point query for single row](benchmarks/charts/s.png)
 
 If sorting is applied to the DataFrame - low cardinality dimension columns first, higher dimension cardinality 
-columns last - then the performance of NanoCube can (not must) improve by up to factor ±10x. Here, the same query
-as above, but the DataFrame is sorted accordingly.
+columns last - then the performance of NanoCube can potentially improve dramatically, ranging from 1.1x up to 
+±10x or even 100x times. Here, the same query as above, but the DataFrame was sorted beforehand.
 
 ![Point query for single row](benchmarks/charts/s_sorted.png)
 
