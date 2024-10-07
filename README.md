@@ -121,15 +121,16 @@ NanoCube is 100x or more times faster than Pandas.
 #### Point query aggregating 5% of rows
 A barely selective, filtering on 2 dimensions that affects and aggregates 5% of rows.
 NanoCube is consistently 10x faster than Pandas. But you can already see, that the 
-aggregation in Numpy become slightly more dominant. 
+aggregation in Numpy become more dominant -> compare the lines of the number of returned 
+records and the NanoCube response time, they are almost parallel. 
 
 ![Point query aggregating 5% of rows](benchmarks/charts/l.png)
 
 #### Point query aggregating 50% of rows
 A non-selective query, filtering on 1 dimension that affects and aggregates 50% of rows.
 Here, most of the time is spent in Numpy, aggregating the rows. The more
-rows, the closer Pandas and NanoCube get as both rely on Numpy for
-aggregation.
+rows, the closer Pandas and NanoCube get as both rely finally on Numpy for
+aggregation, which is very fast.
 
 ![Point query aggregating 50% of rows](benchmarks/charts/xl.png)
 
