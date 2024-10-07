@@ -1,16 +1,18 @@
 from nanocube import NanoCube
-import polars as pl
 import duckdb
 import pandas as pd
-
 from timeit import timeit
+from pathlib import Path
+import os
+
 
 # Create a DataFrame and NanoCube
-df = pd.read_parquet('files/car_prices.parquet')
+file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
+df = pd.read_parquet(file_car_prices)
 ns = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'])
 
 # Create a DuckDB table
-duckdb.sql("CREATE TABLE car_prices AS SELECT * FROM 'files/car_prices.parquet'")
+duckdb.sql(f"CREATE TABLE car_prices AS SELECT * FROM '{file_car_prices}'")
 
 
 def query_nanocube(loops=1000):

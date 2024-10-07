@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     # Deserialize DataFrame from Parquet
     start = datetime.now()
-    df2 = pd.read_parquet('files/df.parquet')
+    df2 = pd.read_parquet('../benchmarks/files/df.parquet')
     duration = (datetime.now() - start).total_seconds()
     print(f"Deserialized dataframe from Parquet in {duration:.5f} sec.")
 
@@ -108,13 +108,13 @@ if __name__ == '__main__':
 
     # Serialize NanoCube to Parquet
     start = datetime.now()
-    serialize_nano(nc, 'files/nanocube.parquet')
+    serialize_nano(nc, '../benchmarks/files/nanocube.parquet')
     duration = (datetime.now() - start).total_seconds()
     print(f"Serialized NanoCube to Parquet in {duration:.5f} sec.")
 
     # Deserialize NanoCube from Parquet
     start = datetime.now()
-    nc2 = deserialize_nano('files/nanocube.parquet')
+    nc2 = deserialize_nano('../benchmarks/files/nanocube.parquet')
     duration = (datetime.now() - start).total_seconds()
     print(f"Deserialized NanoCube to Parquet in {duration:.5f} sec.")
 
