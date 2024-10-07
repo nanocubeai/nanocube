@@ -97,6 +97,12 @@ NanoCube is 100x or more times faster than Pandas.
 
 ![Point query for single row](benchmarks/charts/s.png)
 
+If sorting is applied to the DataFrame - low cardinality dimension columns first, higher dimension cardinality 
+columns last - then the performance of NanoCube can (not must) improve by up to factor ±10x. Here, the same query
+as above, but the DataFrame is sorted accordingly.
+
+![Point query for single row](benchmarks/charts/s_sorted.png)
+
 #### Point query on high cardinality column
 A highly selective, filtering on a single high cardinality dimension, where each member
 represents ±0.01% of rows. NanoCube is 100x or more times faster than Pandas. 

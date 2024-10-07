@@ -16,9 +16,10 @@ df: pd.DataFrame  | None = None
 cube: NanoCube | None = None
 
 class Benchmark:
-    def __init__(self, max_rows=10_000_000, loops= 10):
+    def __init__(self, max_rows=10_000_000, loops= 10, sorted=True):
         self.max_rows = max_rows
         self.loops = loops
+        self.sorted = sorted
         self.data = {"pandas": { "s": [], "m": [], "l": [], "xl": [], "hk": [] },
                         "cube": {"s": [], "m": [], "l": [], "xl": [], "hk": [] },
                         "rows": [],
@@ -26,8 +27,6 @@ class Benchmark:
                         "count": {"s": [], "m": [], "l": [], "xl": [], "hk": [] }}
 
     def generate_data(self, rows):
-        #start = datetime.datetime.now()
-        #print(f"Generating DataFrame with {rows:,}rows ", end="")
         df = pd.DataFrame({'promo':    random.choices([True, False], k=rows),
                            'customer': random.choices(string.ascii_uppercase, weights=range(len(string.ascii_uppercase), 0, -1), k=rows),
                            'segment':  random.choices([f'S{i}' for i in range(10)], weights=range(10, 0, -1), k=rows),
@@ -38,7 +37,8 @@ class Benchmark:
                            'sales':    [1 for _ in range(rows)],
                            'cost':     [1 for _ in range(rows)]})
         members = dict([(col, df[col].unique()) for col in df.columns])
-        #print(f"in {(datetime.datetime.now() - start).total_seconds():.5f} sec.")
+        if self.sorted:
+            df = df.sort_values(by=['promo', 'segment', 'customer', 'category', 'date', 'product', 'order'])
         return df, members
 
     def run(self):
@@ -207,6 +207,6 @@ class Benchmark:
 
 if __name__ == "__main__":
     # run the benchmark
-    b = Benchmark(max_rows=14_000_000)
+    b = Benchmark(max_rows=14_000_000, sorted=False)
     b.run()
 
