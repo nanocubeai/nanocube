@@ -58,10 +58,10 @@ class Benchmark:
 
             # make the cube
             start = datetime.datetime.now()
-            cube = NanoCube(df)
+            cube = NanoCube(df, caching=False)
             duration = (datetime.datetime.now() - start).total_seconds()
             data["duration"].append(duration)
-            print(f", cube init. in {duration:.5f} sec", end="")
+            print(f", cube init in {duration:.5f} sec", end="")
 
             # small query
             for size in ["s", "m", "l", "xl", "hk"]:
