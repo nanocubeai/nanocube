@@ -9,6 +9,7 @@ import os
 # Create a DataFrame and NanoCube
 file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
 df = pd.read_parquet(file_car_prices)
+#df.sort_values(by=['body', 'make', 'model', 'trim'], inplace=True)
 nc = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'], caching=False)
 
 # Connect to in-memory SQLite database
