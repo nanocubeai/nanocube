@@ -22,7 +22,7 @@ class NanoCube:
     used as dimensions and all numeric columns as measures. Roaring Bitmaps (https://roaringbitmap.org) are used
     to construct and query a multi-dimensional cube, Numpy is used for aggregations.
     """
-    def __init__(self, df: pd.DataFrame, dimensions: list | None = None, measures:list | None = None):
+    def __init__(self, df: pd.DataFrame, dimensions: list | None = None, measures:list | None = None, caching: bool = True):
         """
         Initialize an in-memory OLAP cube for fast point queries upon a Pandas DataFrame.
         By default, all non-numeric columns will be used as dimensions and all numeric columns as measures if
@@ -37,7 +37,8 @@ class NanoCube:
             (optional) List of column names from the Pandas DataFrame to be used as dimensions.
         measures : list | None
             (optional) List of columns names from the Pandas DataFrame to be used as measures.
-
+        caching : bool
+            (optional) If True, the results of the queries will be cached for faster subsequent queries.
         Examples
         --------
         >>> import pandas as pd
@@ -61,6 +62,7 @@ class NanoCube:
         self.measures:dict = dict([(col, i) for i, col in enumerate(measures)])
         self.values: list = [df[c].values for c in self.measures.keys()]  # value vectors (references only)
         self.bitmaps: list = []  # bitmaps per dimension per member containing the row ids of the DataFrame
+        self.cache: dict = {"@":0} if caching else None
         for col in self.dimensions.keys():
             try:
                 members, records = np.unique(df[col], return_inverse=True)
@@ -81,12 +83,20 @@ class NanoCube:
             - a scalar if only one measure as arg is given.
             - a list of values for multiple measures if multiple args are given.
         """
+        if self.cache:
+            key = f"{args}-{kwargs}"
+            if key in self.cache:
+                return self.cache[key]
         bitmaps = [(reduce(lambda x, y: x | y, [self.bitmaps[d][m] for m in kwargs[dim]])
                    if (isinstance(kwargs[dim], list) or isinstance(kwargs[dim], tuple)) and not isinstance(kwargs[dim], str)
                    else self.bitmaps[d][kwargs[dim]]) for d, dim in enumerate(self.dimensions.keys()) if dim in kwargs]
         records = reduce(lambda x, y: x & y, bitmaps) if bitmaps else False
         if len(args) == 0: # return all totals as a dict
-            return dict([(c, np.nansum(self.values[i][records]).item()) if records else(c, np.nansum(self.values[i]).item()) for c, i in self.measures.items()])
+            result = dict([(c, np.nansum(self.values[i][records]).item()) if records else(c, np.nansum(self.values[i]).item()) for c, i in self.measures.items()])
         elif len(args) == 1: # return total as scalar
-            return np.nansum(self.values[self.measures[args[0]]][records] if records else self.values[self.measures[args[0]]]).item()
-        return [np.nansum(self.values[self.measures[a]][records] if records else self.values[self.measures[a]]).item() for a in args] # return totals as a list
+            result = np.nansum(self.values[self.measures[args[0]]][records] if records else self.values[self.measures[args[0]]]).item()
+        else:
+            result = [np.nansum(self.values[self.measures[a]][records] if records else self.values[self.measures[a]]).item() for a in args] # return totals as a list
+        if self.cache:
+            self.cache[key] = result
+        return result

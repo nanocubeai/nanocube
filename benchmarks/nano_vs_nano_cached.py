@@ -9,7 +9,7 @@ import os
 # Create a DataFrame and NanoCube
 file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
 df = pd.read_parquet(file_car_prices)
-nc = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'], caching=False)
+ns = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'], caching=False)
 
 # Create a DuckDB table
 duckdb.sql(f"CREATE TABLE car_prices AS SELECT * FROM '{file_car_prices}'")
@@ -18,7 +18,7 @@ duckdb.sql(f"CREATE TABLE car_prices AS SELECT * FROM '{file_car_prices}'")
 def query_nanocube(loops=1000):
     value = 0
     for _ in range(loops):
-        value += nc.get('mmr', model='Optima', trim='LX', make='Kia', body='Sedan')
+        value += ns.get('mmr', model='Optima', trim='LX', make='Kia', body='Sedan')
     return value
 
 def query_duckdb(loops=1000):
