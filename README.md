@@ -52,12 +52,15 @@ for i in range(1000):
 > ```
 
 ### Lightning fast - really?
-For aggregated point queries NanoCube are up to 100x or even 1,000x times faster than Pandas. 
-For this special purpose, NanoCube is even faster than other DataFrame oriented libraries, 
-like Spark, Polars, Modin, Dask or Vaex. If such libraries are a drop-in replacements for Pandas,
-then you should be able to accelerate them with NanoCube too. Try it and let me know.
+For aggregated point queries NanoCube are up to 100x or even 1,000x times faster than Pandas.
+When proper sorting is applied to your DataFrame, the performance might improve even further.
 
-NanoCube is beneficial only if multiple point queries (> 10) need to be executed, as the 
+For the special purpose of aggregative point queries, NanoCube is even by factors faster than other 
+DataFrame oriented libraries, like Spark, Polars, Modin, Dask or Vaex. If such libraries are 
+a drop-in replacements for Pandas, then you should be able to accelerate them with NanoCube too. 
+Try it and let me know.
+
+NanoCube is beneficial only if some point queries (> 5) need to be executed, as the 
 initialization time for the NanoCube needs to be taken into consideration.
 The more point query you run, the more you benefit from NanoCube.
 
