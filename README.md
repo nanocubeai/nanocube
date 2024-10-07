@@ -15,8 +15,8 @@ on Pandas DataFrames. As of now, less than 50 lines of code are required to tran
 multi-dimensional OLAP cube. NanoCube shines when point queries need to be executed on a DataFrame,
 e.g. for financial data analysis, business intelligence or fast web services.
 
-If you believe it would be valuable to **extend NanoCube with additional OLAP features** and improve its speed - 
-_yes, that’s possible_ - please let me know. You can reach out by opening an issue or contacting me 
+If you think it would be valuable to **extend NanoCube with additional OLAP features** 
+please let me know. You can reach out by opening an issue or contacting me 
 on [LinkedIn](https://www.linkedin.com/in/thomas-zeutschler/).
 
 ``` bash
@@ -64,8 +64,8 @@ The more point query you run, the more you benefit from NanoCube.
 
 ### How is this possible?
 NanoCube creates an in-memory multi-dimensional index over all relevant entities/columns in a dataframe.
-Internally, Roaring Bitmaps (https://roaringbitmap.org) are used. Initialization takes some time, but 
-yields very fast filtering and point queries.
+Internally, Roaring Bitmaps (https://roaringbitmap.org) are used for representing the index. 
+Initialization may take some time, but yields very fast filtering and point queries.
 
 Approach: For each unique value in all relevant dimension columns, a bitmap is created that represents the 
 rows in the DataFrame where this value occurs. The bitmaps can then be combined or intersected to determine 
@@ -78,9 +78,9 @@ any Pandas DataFrame for the special purpose of point queries.
 
 ### What price do I have to pay?
 NanoCube is free and MIT licensed. The prices to pay are additional memory consumption, depending on the
-use case typically 25% on top of the original DataFrame and the time needed for initializing the multidimensional
-index, typically 50k - 250k rows/sec depending on the number of columns to be indexed and your hardware. 
-The initialization time is proportional to the number of rows in the DataFrame (see below).
+use case typically 25% on top of the original DataFrame and the time needed for initializing the 
+multi-dimensional index, typically 250k rows/sec depending on the number of columns to be indexed and 
+your hardware. The initialization time is proportional to the number of rows in the DataFrame (see below).
 
 You may want to try and adapt the included samples [`sample.py`](samples/sample.py) and benchmarks 
 [`benchmark.py`](benchmarks/benchmark.py) and [`benchmark.ipynb`](benchmarks/benchmark.ipynb) to test the behavior of NanoCube 
@@ -126,11 +126,11 @@ aggregation.
 ![Point query aggregating 50% of rows](benchmarks/charts/xl.png)
 
 #### NanoCube initialization time
-The time required to initialize a NanoCube instance is linear.
-Depending on the number of dimensions and the cardinality a throughput of
-20k to 200k rows/sec can be expected. Almost all time is spent requesting
-data from Pandas. The initialization of the Roaring Bitmaps taken no time.
-Likely, a custom file format for NanoCube data would be highly beneficial.
+The time required to initialize a NanoCube instance is almost linear.
+The initialization throughput heavily depends on the number of dimension columns. 
+A custom file format will be added soon allowing ±4x times faster loading
+of a NanoCube in comparison to loading the respective parquet dataframe file
+using Arrow.
 
 ![NanoCube initialization time](benchmarks/charts/init.png)
 

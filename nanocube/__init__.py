@@ -1,4 +1,5 @@
 # nanocube - Copyright (c)2024, Thomas Zeutschler, MIT license
+from datetime import datetime
 from functools import reduce
 import numpy as np
 import pandas as pd
@@ -6,7 +7,7 @@ from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_float_dtype
 from pyroaring import BitMap
 
 __author__ = "Thomas Zeutschler"
-__version__ = "0.1.4"
+__version__ = "0.1.5"
 __license__ = "MIT"
 VERSION = __version__
 
@@ -38,7 +39,7 @@ class NanoCube:
         measures : list | None
             (optional) List of columns names from the Pandas DataFrame to be used as measures.
         caching : bool
-            (optional) If True, the results of the queries will be cached for faster subsequent queries.
+            (optional) If True, the results of the queries will be cached for faster repetitive access.
         Examples
         --------
         >>> import pandas as pd
@@ -61,15 +62,16 @@ class NanoCube:
         self.dimensions:dict = dict([(col, i) for i, col in enumerate(dimensions)])
         self.measures:dict = dict([(col, i) for i, col in enumerate(measures)])
         self.values: list = [df[c].values for c in self.measures.keys()]  # value vectors (references only)
-        self.bitmaps: list = []  # bitmaps per dimension per member containing the row ids of the DataFrame
         self.cache: dict = {"@":0} if caching else None
+        self.bitmaps: list = []  # bitmaps per dimension per member containing the row ids of the DataFrame
         for col in self.dimensions.keys():
-            try:
-                members, records = np.unique(df[col], return_inverse=True)
-            except TypeError:
-                members, records = np.unique(df[col].replace({None: ""}), return_inverse=True)
-            self.bitmaps.append(dict([(m, BitMap(np.where(records == i)[0])) for i, m in enumerate(members)]))
-        pass
+            member_bitmaps = {}
+            for row, member in enumerate(df[col].to_list()):
+                if member not in member_bitmaps:
+                    member_bitmaps[member] = BitMap([row])
+                else:
+                    member_bitmaps[member].add(row)
+            self.bitmaps.append(member_bitmaps)
 
     def get(self, *args, **kwargs):
         """

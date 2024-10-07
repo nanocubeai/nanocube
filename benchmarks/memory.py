@@ -12,7 +12,6 @@ from memory_profiler import profile
 # Create a DataFrame and NanoCube
 file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
 df = pd.read_parquet(file_car_prices)
-print(", ".join([f"'{col}'" for col in df.columns]))
 
 
 @profile
