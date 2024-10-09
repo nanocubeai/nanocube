@@ -6,15 +6,6 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_float_dtype
 from pyroaring import BitMap
 
-__author__ = "Thomas Zeutschler"
-__version__ = "0.1.5"
-__license__ = "MIT"
-VERSION = __version__
-
-__all__ = [
-    "NanoCube",
-]
-
 
 class NanoCube:
     """
@@ -23,7 +14,7 @@ class NanoCube:
     used as dimensions and all numeric columns as measures. Roaring Bitmaps (https://roaringbitmap.org) are used
     to construct and query a multi-dimensional cube, Numpy is used for aggregations.
     """
-    def __init__(self, df: pd.DataFrame, dimensions: list | None = None, measures:list | None = None, caching: bool = True):
+    def __init__(self, df: pd.DataFrame, dimensions: 'list | None' = None, measures:'list | None' = None, caching: bool = True):
         """
         Initialize an in-memory OLAP cube for fast point queries upon a Pandas DataFrame.
         By default, all non-numeric columns will be used as dimensions and all numeric columns as measures if

@@ -2,6 +2,7 @@
 numpy >= 1.24.0
 pandas
 pyroaring
+sortednp==0.5.0
 
 # for deployment
 build

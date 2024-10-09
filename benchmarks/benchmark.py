@@ -11,9 +11,10 @@ import pandas as pd
 
 
 from nanocube import NanoCube
+from nanocube.cube2 import Cube2
 
-df: pd.DataFrame  | None = None
-cube: NanoCube | None = None
+df: pd.DataFrame = None
+cube: NanoCube = None
 
 class Benchmark:
     def __init__(self, max_rows=10_000_000, loops= 10, sorted=True):
@@ -22,6 +23,7 @@ class Benchmark:
         self.sorted = sorted
         self.data = {"pandas": { "s": [], "m": [], "l": [], "xl": [], "hk": [] },
                         "cube": {"s": [], "m": [], "l": [], "xl": [], "hk": [] },
+                        "cube2": {"s": [], "m": [], "l": [], "xl": [], "hk": [] },
                         "rows": [],
                         "duration" : [],
                         "count": {"s": [], "m": [], "l": [], "xl": [], "hk": [] }}
@@ -43,11 +45,12 @@ class Benchmark:
 
     def run(self):
         # collect data
-        global df, cube
+        global df, cube, cube2
         data = self.data
         print("Running benchmarks. Please wait...")
 
         rows = 100
+        # rows = self.max_rows
         while rows <= self.max_rows:
             print(f"...with {rows:,} rows and {self.loops} loops", end="")
             b_start = datetime.datetime.now()
@@ -63,16 +66,27 @@ class Benchmark:
             data["duration"].append(duration)
             print(f", cube init in {duration:.5f} sec", end="")
 
+            start = datetime.datetime.now()
+            cube2 = Cube2(df, caching=False)
+            duration = (datetime.datetime.now() - start).total_seconds()
+
+            print(f", cube2 init in {duration:.5f} sec", end="")
+
+
             # small query
             for size in ["s", "m", "l", "xl", "hk"]:
                 query_p, query_c, count = self.get_queries(size, members, rows)
                 data["count"][size].append(count)
                 data["pandas"][size].append(timeit.timeit(query_p, globals=globals(), number=self.loops) / self.loops)
                 data["cube"][size].append(timeit.timeit(query_c, globals=globals(), number=self.loops) / self.loops)
+                data["cube2"][size].append(timeit.timeit(query_c, globals={**globals(), "cube": cube2}, number=self.loops) / self.loops)
 
             b_duration = (datetime.datetime.now() - b_start).total_seconds()
             print(f", overall in {b_duration:.5f} sec.")
             rows = rows * 2
+
+        print(data["cube"])
+        print(data["cube2"])
 
         # create charts
         self.create_query_chart(data, "s", "Single Row Point Query", "7 filter columns.")
@@ -136,9 +150,13 @@ class Benchmark:
             cube_query = f"cube.get('sales', order='{order}')"
             c_value = eval(cube_query)
 
+        c2_value = eval("cube2" + cube_query[4:])
 
         if p_value != c_value:
             raise ValueError(f"Upps, something went totally wrong: {p_value} != {c_value}") # this should never happen
+        if p_value != c2_value:
+            raise ValueError(f"Cube2 value does not match p value: {p_value} != {c2_value}")
+
         return pandas_query, cube_query, p_value
 
 
@@ -159,6 +177,9 @@ class Benchmark:
         ax.plot(data["rows"], data["cube"][size],
                 label=f"NanoCube", color="black",
                 linestyle='solid', marker=".")
+        ax.plot(data["rows"], data["cube2"][size],
+                label=f"Cube2", color="black",
+                linestyle='solid', marker="o")
         ax.legend(loc='upper left')
 
 
@@ -178,7 +199,7 @@ class Benchmark:
         sub_title = f"Ø duration per query over N={self.loops} repetitions. " + subtitle_postfix
         plt.title(sub_title, fontsize=10)
         fig.savefig(f"charts/{size}.png")
-        plt.show()
+        # plt.show()
 
     def create_maketime_chart(self, data):
         # create the chart
@@ -202,11 +223,12 @@ class Benchmark:
         sub_title = f"From existing Pandas DataFrame with Ø {ops:,} rows/sec."
         plt.title(sub_title, fontsize=10)
         fig.savefig(f"charts/init.png")
-        plt.show()
+        # plt.show()
 
 
 if __name__ == "__main__":
     # run the benchmark
     b = Benchmark(max_rows=14_000_000, sorted=False)
+    # b = Benchmark(max_rows=14_000_0, sorted=False)
     b.run()
 
