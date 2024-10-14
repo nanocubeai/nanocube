@@ -3,22 +3,27 @@ import pandas as pd
 import polars as pl
 from timeit import timeit
 from pathlib import Path
+
+
 import os
 
 # Create a DataFrame and NanoCube
 file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
 df = pd.read_parquet(file_car_prices)
 #df.sort_values(by=['body', 'make', 'model', 'trim'], inplace=True)
-ns = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'], caching=False)
+df.sort_values(by=['model', 'make', 'trim', 'body'], inplace=True)
+nc = NanoCube(df, dimensions=['make', 'model', 'trim', 'body'], measures=['mmr'], caching=False)
 
 # Create a Polars table
-df = pl.read_parquet(file_car_prices)
+#df = pl.read_parquet(file_car_prices)
+df = pl.from_pandas(df)
+
 
 
 def query_nanocube(loops=1000):
     value = 0
     for _ in range(loops):
-        value += ns.get('mmr', model='Optima', trim='LX', make='Kia', body='Sedan')
+        value += nc.get('mmr', model='Optima', trim='LX', make='Kia', body='Sedan')
     return value
 
 def query_polars(loops=1000):

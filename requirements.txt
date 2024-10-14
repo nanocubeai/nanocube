@@ -2,6 +2,10 @@
 numpy >= 1.24.0
 pandas
 pyroaring
+sortednp
+lz4
+zstandard
+tabulate
 
 # for deployment
 build
