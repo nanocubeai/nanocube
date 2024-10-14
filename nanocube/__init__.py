@@ -4,7 +4,7 @@ from nanocube.nano_index import NanoIndex
 from nanocube.nano_cube import NanoCube
 
 __author__ = "Thomas Zeutschler"
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 __license__ = "MIT"
 VERSION = __version__
 
