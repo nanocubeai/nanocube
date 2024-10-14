@@ -161,3 +161,11 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
+/research/functional_data_structures_algorithms.pdf
+/research/files/car_prices.nano
+/research/files/df.parquet
+/research/files/numpy.nano
+/research/files/roaring.nano
+/benchmarks/files/df.parquet
+/benchmarks/files/nanocube.parquet
+/benchmarks/files/nanocube2.parquet

@@ -37,7 +37,11 @@ maintainers = [
 dependencies = [
     "numpy",
     "pandas",
-    "pyroaring"
+    "pyroaring",
+    "pyarrow",
+    "sortednp",
+    "lz4",
+    "zstandard",
 ]
 
 [project.urls]
