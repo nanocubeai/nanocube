@@ -54,7 +54,7 @@ initialization time for the NanoCube needs to be taken into consideration.
 The more point query you run, the more you benefit from NanoCube.
 
 ### Benchmark - NanoCube vs. Others
-The following table shows the duration for a single point query on the
+The following table shows the duration for 1000x point queries on the
 `car_prices_us` dataset (available on [kaggle.com](https://www.kaggle.com)) containing 16x columns and 558,837x rows. 
 The query is highly selective, filtering on 4 dimensions `(model='Optima', trim='LX', make='Kia', body='Sedan')` and 
 aggregating column `mmr`. The factor is the speedup of NanoCube vs. the respective technology.
