@@ -64,12 +64,13 @@ To reproduce the benchmark, you can execute file [nano_vs_others.py](benchmarks/
 
 |    | technology       |   duration_sec |   factor |
 |---:|:-----------------|---------------:|---------:|
-|  0 | NanoCube         |          0.021 |    1     |
-|  1 | SQLite (indexed) |          0.196 |    9.333 |
-|  2 | Polars           |          0.844 |   40.19  |
-|  3 | DuckDB           |          5.315 |  253.095 |
-|  4 | SQLite           |         17.54  |  835.238 |
-|  5 | Pandas           |         51.931 | 2472.91  |
+|  0 | NanoCube         |          0.016 |    1     |
+|  1 | SQLite (indexed) |          0.133 |    8.312 |
+|  2 | Polars           |          0.534 |   33.375 |
+|  3 | Arrow            |          1.933 |  120.812 |
+|  4 | DuckDB           |          4.171 |  260.688 |
+|  5 | SQLite           |         12.452 |  778.25  |
+|  6 | Pandas           |         36.457 | 2278.56  |
 
 
 ### How is this possible?
@@ -116,55 +117,85 @@ multi-dimensional index, typically 250k rows/sec depending on the number of colu
 your hardware. The initialization time is proportional to the number of rows in the DataFrame (see below).
 
 You may want to try and adapt the included samples [`sample.py`](samples/sample.py) and benchmarks 
-[`benchmark.py`](benchmarks/benchmark.py) and [`benchmark.ipynb`](benchmarks/benchmark.ipynb) to test the behavior of NanoCube 
+[`benchmark.py`](benchmarks/benchmark_pandas.py) and [`benchmark.ipynb`](benchmarks/benchmark.ipynb) to test the behavior of NanoCube 
 on your data.
 
 ## NanoCube Benchmarks
 
-Using the Python script [benchmark.py](benchmarks/benchmark.py), the following comparison charts can be created.
-The data set contains 7 dimension columns and 2 measure columns.
+Using the Python script [benchmark_all.py](benchmarks/benchmark_all.py), the following comparison charts can be created.
+The datasets are made of random data with 2 numerical columns and 7 categorical columns with different cardinalities 
+ranging from 2 up to the number of rows. The dataset starts at just 100 rows and then the size is doubled until >10M 
+rows are reached. For further details, see the [benchmark_all.py](benchmarks/benchmark_all.py) script.
+
+> **_CAUTION:_** Benchmarks should be taken with a grain of salt. These tests were run on a 16-core Apple Silicon 
+> M4 Max MacBook Pro; results may vary significantly on Windows or Linux machines. They focus on fast filtering and 
+> aggregate point queries, not joins, groupbys, or other SQL operations. Despite this, the benchmarks provide a good 
+> indication of NanoCube’s performance relative to other DataFrame technologies. *Enjoy...*
+
+Let's see how CubePandas performs on different types of aggregative point queries against the famous competitors (in alphatecical order).
+All engine are used in-memory only and have been called from Python:
+
+* **PyArrow** [link](https://arrow.apache.org/docs/python/index.html) - Apache Arrow is a development platform for in-memory analytics. It contains a set of technologies that enable big data systems to store, process and move data fast.
+* **DuckDB** [link](https://duckdb.org) - DuckDB is a fast in-process analytical database system. DuckDB supports a feature-rich SQL dialect complemented with deep integrations into client APIs.
+* **NanoCube** ([Roaring](https://roaringbitmap.org) Index) - Just a few lines of single-threaded Python code. 
+* **NanoCube** ([Numpy](https://numpy.org) Index) - NanoCube is a minimalistic in-memory, in-process OLAP engine for lightning fast point queries writen in Python.
+* **Pandas** [link](https://pandas.pydata.org) - NanoCube this time uses a different index, based on Numpy arrays instead of Roaring Bitmaps.
+* **Polars** [link](https://pola.rs) - Polars is a blazingly fast DataFrame library implemented in Rust and built on top of Apache Arrow.
+* **SQLite** [link](https://www.sqlite.org) - SQLite is a C-language library that implements a small, fast, self-contained, high-reliability, full-featured, SQL database engine.
+* **SQLite fully indexed** [link](https://www.sqlite.org) - SQLite is now indexed on all categorical columns of the dataset.
+
+Let's take a look at different types of queries and how NanoCube performs in comparison to the competitors.
 
 #### Point query for a single row
-A highly selective query, fully qualified and filtering on all 7 dimensions. The query will return and aggregates 1 single row.
-NanoCube is 250x up to 60,000x more times faster than Pandas, depending on the number of size in the DataFrame,
-the more rows, the faster NanoCube is in comparison to Pandas.
+A highly selective query, fully qualified and filtering over all 7 dimensions. The query will return and aggregates 1 single row.
+NanoCube is faster than competitors, for larger datasets up to 10,000x times than Pandas.
+Polars is really super-fast, though still 100x slower on such very selective queries. 
+Interestingly, SQLite fully indexed can't make much profit from all the indexes. As always,
+Pandas, although beeing the most popular dataframe engine, is the slowest on increasingly large datasets.
 
 ![Point query for single row](benchmarks/charts/s.png)
 
 
 #### Point query on high cardinality column
 A highly selective, filtering on a single high cardinality dimension, where each member
-represents ±0.01% of rows. NanoCube is 100x or more times faster than Pandas. 
+represents ±0.01% of the dataset. Also here, I would have expected SQLite fully indexed 
+to be faster (query on a single fully index column), but it is not. The pyArrow library 
+is a bit disappointing. Polars is again super-fast.  
 
 ![Query on single high cardinality column](benchmarks/charts/hk.png)
 
 
 #### Point query aggregating 0.1% of rows
-A highly selective, filtering on 1 dimension that affects and aggregates 0.1% of rows.
-NanoCube is 100x or more times faster than Pandas. 
+A highly selective, filtering on 1 dimension that affects and aggregates 0.1% of the dataset,
+e.g. if we have 1M rows, then 1,000 rows are affected and aggregated. 
 
 ![Point query aggregating 0.1% of rows](benchmarks/charts/m.png)
 
 #### Point query aggregating 5% of rows
 A barely selective, filtering on 2 dimensions that affects and aggregates 5% of rows.
-NanoCube is consistently 10x faster than Pandas. But you can already see, that the 
-aggregation in Numpy become more dominant -> compare the lines of the number of returned 
-records and the NanoCube response time, they are almost parallel. 
+At this size of query results, the time spent in for numerical aggregation becomes more dominant.
+At this size, both DuckDB and Polars shine. Very interestingly the fully indexed SQLite is slowest,
+even slower than the unindexed SQLite database. no clue why
+
 
 ![Point query aggregating 5% of rows](benchmarks/charts/l.png)
 
 If sorting is applied to the DataFrame - low cardinality dimension columns first, higher dimension cardinality 
 columns last - then the performance of NanoCube can potentially improve dramatically, ranging from not faster
-up to ±10x or more times faster. Here, the same query as above, but the DataFrame was sorted beforehand.
+up to ±10x or more times faster. Here, the same query as above, but the DataFrame was sorted over all columns 
+beforehand. The reason is that both, Roaring Bitmaps index and the Numpy index, now benefit from 
+better cache locality and less memory fragmentation due to sequential access to memory.
 
 ![Point query for single row](benchmarks/charts/l_sorted.png)
 
 
 #### Point query aggregating 50% of rows
 A non-selective query, filtering on 1 dimension that affects and aggregates 50% of rows.
-Here, most of the time is spent in Numpy, aggregating the rows. The more
-rows, the closer Pandas and NanoCube get as both rely finally on Numpy for
-aggregation, which is very fast.
+Here, most of the time is spent on aggregating values. 
+As NanoCube is just single-threaded interpreted Python code, it can't keep up with the 
+multithreaded power houses Polars and especially DuckDB. When it comes to mass data processing
+and aggregation, DuckDB is likely the current best technology out there.
+
 
 ![Point query aggregating 50% of rows](benchmarks/charts/xl.png)
 

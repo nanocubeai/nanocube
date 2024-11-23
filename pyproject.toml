@@ -39,9 +39,19 @@ dependencies = [
     "pandas",
     "pyroaring",
     "pyarrow",
-    "sortednp",
     "lz4",
     "zstandard",
+
+    "tabulate",
+    "duckdb",
+    "polars",
+    "matplotlib",
+
+    # for deployment
+    "build",
+    "wheel",
+    "twine",
+    "pytest",
 ]
 
 [project.urls]
