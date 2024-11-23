@@ -10,8 +10,12 @@ from nanocube import NanoCube
 import duckdb
 import polars as pl
 import sqlite3
+import pyarrow as pa
+import pyarrow.compute as pc
 
 
+
+    
 
 # Initialize DataFrame
 file_car_prices = Path(os.path.dirname(os.path.realpath(__file__))) / "files" / "car_prices.parquet"
@@ -37,6 +41,10 @@ conn_idx = sqlite3.connect(':memory:')
 df.to_sql('car_prices', conn_idx, index=False)
 cursor_idx = conn_idx.cursor()
 cursor_idx.execute("CREATE INDEX index_car_prices ON car_prices (make, model, trim, body);")
+
+# Initialize Arrow
+pat = pa.Table.from_pandas(df)
+
 
 def query_pandas(loops=1000):
     value = 0
@@ -80,6 +88,25 @@ def query_sqlite_idx(loops=1000):
         value += result
     return value
 
+def query_arrow(loops=1000):
+    value = 0
+    for _ in range(loops):
+        criteria = [
+            pc.equal(pat["model"], "Optima"),
+            pc.equal(pat["trim"], "LX"),
+            pc.equal(pat["make"], "Kia"),
+            pc.equal(pat["body"], "Sedan"),
+        ]
+        combined_filter = criteria[0]
+        for condition in criteria[1:]:
+            combined_filter = pc.and_(combined_filter, condition)
+
+        filtered_table = pat.filter(combined_filter)
+        value += pc.sum(filtered_table['mmr']).as_py()
+
+    return value
+
+
 
 if __name__ == '__main__':
 
@@ -90,6 +117,7 @@ if __name__ == '__main__':
         'SQLite': query_sqlite,
         'SQLite (indexed)': query_sqlite_idx,
         'NanoCube': query_nanocube,
+        'Arrow': query_arrow
     }
     print ("Benchmarking NanoCube vs Others (please wait...)")
     print ("*"*50)

@@ -169,3 +169,5 @@ cython_debug/
 /benchmarks/files/df.parquet
 /benchmarks/files/nanocube.parquet
 /benchmarks/files/nanocube2.parquet
+/libs/
+/nanocube_old/

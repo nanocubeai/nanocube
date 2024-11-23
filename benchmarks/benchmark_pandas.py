@@ -6,7 +6,7 @@ import datetime
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import pandas as pd
-from rfc3986.abnf_regexp import segments
+
 
 from nano_index import IndexingMethod
 #from nanocube import NanoCube
@@ -244,7 +244,7 @@ class Benchmark:
 if __name__ == "__main__":
     # run the benchmark
     #
-    rows = 1_000_000
+    rows = 3_000_000
     Benchmark(max_rows=rows, sorted=False).run()
     Benchmark(max_rows=rows, sorted=True).run()
 
