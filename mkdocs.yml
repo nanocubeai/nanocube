@@ -1,0 +1,149 @@
+site_name: cubedpandas
+site_description: Multi-dimensional data analysis for Pandas dataframes.
+site_author: Thomas Zeutschler
+site_url: https://zeutschler.github.io/cubedpandas/
+
+copyright: Copyright &copy; 2024 Thomas Zeutschler
+
+repo_url: https://github.com/Zeutschler/cubedpandas
+repo_name: zeutschler/cubedpandas
+
+extra:
+  homepage: https://zeutschler.github.io/cubedpandas/
+  version:
+    provider: mike
+  analytics:
+    provider: google
+    property: G-P329GF2G3W
+  consent:
+    title: Cookie consent
+    description: >-
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better. Many thanks!
+    actions:
+      - accept
+      - manage
+      - reject
+  social:
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/in/thomas-zeutschler/
+      name: Thomas on LinkedIn
+    - icon: fontawesome/brands/github
+      link: https://github.com/Zeutschler
+      name: Thomas on GitHub
+
+extra_css:
+  - stylesheets/extra.css
+
+theme:
+  name: material
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.expand
+    - search.suggest
+    - content.code.copy
+
+  palette:
+    # primary: custom
+    # accent: custom
+    - scheme: default
+      toggle:
+        icon: material/toggle-switch
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      toggle:
+        icon: material/toggle-switch-off-outline
+        name: Switch to light mode
+
+  favicon: assets/icons/favicon.ico
+  logo: assets/cube512.png
+  icon:
+    repo: fontawesome/brands/git-alt
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.details
+  - pymdownx.superfences
+  - toc:
+      permalink: true
+  - tables
+  - attr_list
+  - md_in_html
+
+
+plugins:
+  - search
+  - privacy
+  - blog
+
+  - mkdocstrings:
+      enabled: !ENV [ ENABLE_MKDOCSTRINGS, true ]
+      default_handler: python
+
+      handlers:
+        python:
+          paths: [ cubedpandas ]
+          options:
+            docstring_style: google
+            docstring_section_style: list
+            ignore_init_summary: false
+            show_if_no_docstring: false
+            show_docstring_description: true
+            show_docstring_examples: true
+            show_docstring_raises: true
+            show_docstring_returns: true
+            show_docstring_warns: true
+            show_docstring_yields: true
+            show_source: false
+            show_bases: true
+
+            members_order: source
+  - mike:    # see https://squidfunk.github.io/mkdocs-material/setup/setting-up-versioning/
+  - exclude:
+      glob:
+        - "*.pptx"
+        - "readme.md"
+
+nav:
+  - Home:
+      - 'Welcome': 'index.md'
+      - 'Use Cases': 'use-cases.md'
+      - 'FAQ': 'faq.md'
+      - 'Installation': 'installation.md'
+      - 'Getting Started': 'getting-started.md'
+      - 'Guides':
+          - 'Cheatsheet (pdf)': 'guides/cheatsheet.md'
+          - 'Using Custom Schema': 'guides/best-practise-schema.md'
+          - 'Aggregations': 'guides/best-practise-aggregations.md'
+          - 'Advanced Filtering': 'guides/best-practise-filtering.md'
+          - 'DateTime Intelligence': 'guides/best-practise-datetime.md'
+          - 'Pivot Tables': 'guides/best-practise-pivot-tables.md'
+      - 'API Documentation':
+          - 'cubed methods': 'api/method-cubed.md'
+          - 'Cube': 'api/class-cube.md'
+          - 'Schema': 'api/class-schema.md'
+          - 'Context': 'api/class-context.md'
+          - 'Dimension': 'api/class-dimension.md'
+          - 'Measure': 'api/class-measure.md'
+      - 'License': 'license.md'
+      - 'Blog': 'blog/index.md'
+      - 'About': 'about/thomas.md'
+  - 'Blog':
+      - 'blog/index.md'
+  - 'About':
+      - 'About me': 'about/thomas.md'
+      - 'License': 'about/license.md'
+      - 'Contributing': 'about/contributing.md'
+      - 'Release Notes': 'about/release-notes.md'
