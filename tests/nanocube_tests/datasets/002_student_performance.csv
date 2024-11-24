@@ -1,0 +1,11 @@
+StudentID,Name,Gender,AttendanceRate,StudyHoursPerWeek,PreviousGrade,ExtracurricularActivities,ParentalSupport,FinalGrade
+1,John,Male,85,15,78,1,High,80
+2,Sarah,Female,90,20,85,2,Medium,87
+3,Alex,Male,78,10,65,0,Low,68
+4,Michael,Male,92,25,90,3,High,92
+5,Emma,Female,88,18,82,2,Medium,85
+6,Olivia,Female,95,30,88,1,High,90
+7,Daniel,Male,70,8,60,0,Low,62
+8,Sophia,Female,85,17,77,1,Medium,78
+9,James,Male,82,12,70,2,Low,72
+10,Isabella,Female,91,22,86,3,High,88

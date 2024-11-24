@@ -39,6 +39,7 @@ dependencies = [
     "pandas",
     "pyroaring",
     "pyarrow",
+    "loguru",
     "lz4",
     "zstandard",
 

@@ -1,19 +1,21 @@
 # nanocube - Copyright (c)2024, Thomas Zeutschler, MIT license
 numpy >= 1.24.0
-pandas
-pyroaring
-pyarrow
-lz4
-zstandard
+pandas~=2.2.3
+pyroaring~=1.0.0
+pyarrow~=18.0.0
+lz4~=4.3.3
+zstandard~=0.23.0
 
-sortednp
+sortednp~=0.5.0
 tabulate
-duckdb
-polars
-matplotlib
+duckdb~=1.1.3
+polars~=1.14.0
+matplotlib~=3.9.2
 
 # for deployment
 build
 wheel
 twine
 pytest
+loguru~=0.7.2
+setuptools~=75.6.0

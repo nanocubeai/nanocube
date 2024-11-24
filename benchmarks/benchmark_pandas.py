@@ -8,7 +8,7 @@ from matplotlib import ticker
 import pandas as pd
 
 
-from nano_index import IndexingMethod
+from nanocube.nano_index import IndexingMethod
 #from nanocube import NanoCube
 from nanocube.nano_cube import NanoCube as NanoCube
 #from nanocube.cube2 import Cube2

@@ -28,11 +28,11 @@ from nanocube import NanoCube
 
 # create a DataFrame
 df = pd.read_csv('sale_data.csv')
-value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['engine'] == 'hybrid')]['revenue'].sum()
+value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['nano'] == 'hybrid')]['revenue'].sum()
 
 # create a NanoCube and run sum aggregated point queries
 # Declare the column supposed to be aggregated in `measures` and filtered in `dimensions`
-nc = NanoCube(df, dimensions=["make", "engine"], measures=["revenue"])
+nc = NanoCube(df, dimensions=["make", "nano"], measures=["revenue"])
 for i in range(1000):
     value = nc.get('revenue', make=['Audi', 'BMW'], engine='hybrid')
 ```
@@ -116,7 +116,7 @@ use case typically 25% on top of the original DataFrame and the time needed for 
 multi-dimensional index, typically 250k rows/sec depending on the number of columns to be indexed and 
 your hardware. The initialization time is proportional to the number of rows in the DataFrame (see below).
 
-You may want to try and adapt the included samples [`sample.py`](samples/sample.py) and benchmarks 
+You may want to try and adapt the included samples [`sample.py`](samples/nano_engine/sample.py) and benchmarks 
 [`benchmark.py`](benchmarks/benchmark_pandas.py) and [`benchmark.ipynb`](benchmarks/benchmark.ipynb) to test the behavior of NanoCube 
 on your data.
 

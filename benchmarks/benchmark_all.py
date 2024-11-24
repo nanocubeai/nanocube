@@ -1,15 +1,11 @@
 # nanocube - Copyright (c)2024, Thomas Zeutschler, MIT license
 import random
-import timeit
 import string
 import datetime
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 import pandas as pd
-import numpy as np
 import polars as pl
-import duckdb
-from nano_index import IndexingMethod
 from nanocube import NanoCube as NanoCube
 import sqlite3
 import pyarrow as pa

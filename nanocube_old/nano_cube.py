@@ -6,8 +6,7 @@ import pandas as pd
 from pandas.api.types import is_numeric_dtype, is_bool_dtype, is_float_dtype
 from pyroaring import BitMap
 
-from nanocube.schema import Schema
-from nanocube.nano_index import NanoIndex, NanoRoaringIndex, NanoNumpyIndex, IndexingMethod
+from nanocube.nano_index import NanoIndex, IndexingMethod
 import lz4.frame
 import zstandard as zstd
 
