@@ -10,6 +10,10 @@
 
 -----------------
 
+> **Info**: NanoCube is under active development and subject to change.
+> This current version, although working nicely, should be seen as a first proof of concept.
+
+
 **NanoCube** is a minimalistic in-memory, in-process OLAP engine for lightning fast point queries
 on Pandas DataFrames. NanoCube shines when filtering and/or point queries need to be executed on a DataFrame,
 e.g. for financial data analysis, business intelligence or fast web services.

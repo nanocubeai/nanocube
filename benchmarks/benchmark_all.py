@@ -418,7 +418,7 @@ class Benchmark:
 if __name__ == "__main__":
     # run the benchmark
     #
-    rows = 10_000_000
+    rows = 54_000_000
     Benchmark(max_rows=rows, sorted=False).run()
     Benchmark(max_rows=rows, sorted=True).run()
 
