@@ -1,6 +1,6 @@
 # NanoCube
 
-## Lightning fast OLAP-style point queries on DataFrames.
+## Fast OLAP-style point queries on DataFrames.
 
 ![GitHub license](https://img.shields.io/github/license/Zeutschler/nanocube?color=A1C547)
 ![PyPI version](https://img.shields.io/pypi/v/nanocube?logo=pypi&logoColor=979DA4&color=A1C547)
@@ -9,10 +9,6 @@
 ![unit tests](https://img.shields.io/github/actions/workflow/status/zeutschler/nanocube/python-package.yml?logo=GitHub&logoColor=979DA4&label=unit%20tests&color=A1C547)
 
 -----------------
-
-> **Info**: NanoCube is under active development and subject to change.
-> This current version, although working nicely, should be seen as a first proof of concept.
-
 
 **NanoCube** is a minimalistic in-memory, in-process OLAP engine for lightning fast point queries
 on Pandas DataFrames. NanoCube shines when filtering and/or point queries need to be executed on a DataFrame,
@@ -32,11 +28,11 @@ from nanocube import NanoCube
 
 # create a DataFrame
 df = pd.read_csv('sale_data.csv')
-value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['engine'] == 'hybrid')]['revenue'].sum()
+value = df.loc[(df['make'].isin(['Audi', 'BMW']) & (df['nano'] == 'hybrid')]['revenue'].sum()
 
 # create a NanoCube and run sum aggregated point queries
 # Declare the column supposed to be aggregated in `measures` and filtered in `dimensions`
-nc = NanoCube(df, dimensions=["make", "engine"], measures=["revenue"])
+nc = NanoCube(df, dimensions=["make", "nano"], measures=["revenue"])
 for i in range(1000):
     value = nc.get('revenue', make=['Audi', 'BMW'], engine='hybrid')
 ```
@@ -120,7 +116,7 @@ use case typically 25% on top of the original DataFrame and the time needed for 
 multi-dimensional index, typically 250k rows/sec depending on the number of columns to be indexed and 
 your hardware. The initialization time is proportional to the number of rows in the DataFrame (see below).
 
-You may want to try and adapt the included samples [`sample.py`](samples/sample.py) and benchmarks 
+You may want to try and adapt the included samples [`sample.py`](samples/nano_engine/sample.py) and benchmarks 
 [`benchmark.py`](benchmarks/benchmark_pandas.py) and [`benchmark.ipynb`](benchmarks/benchmark.ipynb) to test the behavior of NanoCube 
 on your data.
 
@@ -149,8 +145,11 @@ All engine are used in-memory only and have been called from Python:
 * **SQLite fully indexed** [link](https://www.sqlite.org) - SQLite is now indexed on all categorical columns of the dataset.
 
 Let's take a look at different types of queries and how NanoCube performs in comparison to the competitors.
+> **IMPORTANT** There are always 2 charts per query. The first chart shows the query times on unsorted/random data, 
+> the second chart shows the query times on sorted data. The sorting is done over all columns, low cardinality columns first,
+> high cardinality columns last. The sorting can improve the performance of NanoCube significantly, up to 10x times or more.
 
-#### Point query for a single row
+### 1. Point query for a single row
 A highly selective query, fully qualified and filtering over all 7 dimensions. The query will return and aggregates 1 single row.
 NanoCube is faster than competitors, for larger datasets up to 10,000x times than Pandas.
 Polars is really super-fast, though still 100x slower on such very selective queries. 
@@ -158,24 +157,27 @@ Interestingly, SQLite fully indexed can't make much profit from all the indexes.
 Pandas, although beeing the most popular dataframe engine, is the slowest on increasingly large datasets.
 
 ![Point query for single row](benchmarks/charts/s.png)
+![Point query for single row on sorted data](benchmarks/charts/s_sorted.png)
 
 
-#### Point query on high cardinality column
+### 2. Point query on high cardinality column
 A highly selective, filtering on a single high cardinality dimension, where each member
 represents ±0.01% of the dataset. Also here, I would have expected SQLite fully indexed 
 to be faster (query on a single fully index column), but it is not. The pyArrow library 
 is a bit disappointing. Polars is again super-fast.  
 
 ![Query on single high cardinality column](benchmarks/charts/hk.png)
+![Query on single high cardinality column on sorted data](benchmarks/charts/hk_sorted.png)
 
 
-#### Point query aggregating 0.1% of rows
+### 3. Point query aggregating 0.1% of rows
 A highly selective, filtering on 1 dimension that affects and aggregates 0.1% of the dataset,
 e.g. if we have 1M rows, then 1,000 rows are affected and aggregated. 
 
 ![Point query aggregating 0.1% of rows](benchmarks/charts/m.png)
+![Point query aggregating 0.1% of rows on sorted data](benchmarks/charts/m_sorted.png)
 
-#### Point query aggregating 5% of rows
+### 4. Point query aggregating 5% of rows
 A barely selective, filtering on 2 dimensions that affects and aggregates 5% of rows.
 At this size of query results, the time spent in for numerical aggregation becomes more dominant.
 At this size, both DuckDB and Polars shine. Very interestingly the fully indexed SQLite is slowest,
@@ -183,15 +185,7 @@ even slower than the unindexed SQLite database. no clue why
 
 
 ![Point query aggregating 5% of rows](benchmarks/charts/l.png)
-
-If sorting is applied to the DataFrame - low cardinality dimension columns first, higher dimension cardinality 
-columns last - then the performance of NanoCube can potentially improve dramatically, ranging from not faster
-up to ±10x or more times faster. Here, the same query as above, but the DataFrame was sorted over all columns 
-beforehand. The reason is that both, Roaring Bitmaps index and the Numpy index, now benefit from 
-better cache locality and less memory fragmentation due to sequential access to memory.
-
-![Point query for single row](benchmarks/charts/l_sorted.png)
-
+![Point query aggregating 5% of rows on sorted data](benchmarks/charts/l_sorted.png)
 
 #### Point query aggregating 50% of rows
 A non-selective query, filtering on 1 dimension that affects and aggregates 50% of rows.
@@ -202,8 +196,9 @@ and aggregation, DuckDB is likely the current best technology out there.
 
 
 ![Point query aggregating 50% of rows](benchmarks/charts/xl.png)
+![Point query aggregating 50% of rows on sorted data](benchmarks/charts/xl_sorted.png)
 
-#### NanoCube initialization time
+### 5.  NanoCube initialization time
 The time required to initialize a NanoCube instance is almost linear.
 The initialization throughput heavily depends on the number of dimension columns. 
 A custom file format will be added soon allowing ±4x times faster loading
@@ -212,5 +207,17 @@ using Arrow.
 
 ![NanoCube initialization time](benchmarks/charts/init.png)
 
+### 6.  Loading times
+The loading times for each technology on a 12M rows dataset are also
+an important factor. As NanoCube needs to create a full index over all
+relevant columns, the loading time is significant. The loading time
 
-
+|   | technology       |   sec. | comment                                                |
+|--:|:-----------------|-------:|--------------------------------------------------------|
+| 1 | DuckDB           |  1.012 | impressive!                                            |
+| 2 | Arrow            |  1.085 |                                                        |
+| 3 | Polars           |  2.046 |                                                        | 
+| 4 | NanoCube         |  5.533 | uses Arrow to load the data >>> ± 4.5 sec for indexing |
+| 5 | SQLite           | 12.081 |                                                        |
+| 6 | SQLite (indexed) | 32.950 | ±20 sec for indexing                                   |
+| ? | Pandas           |    #NA |                                                        |
