@@ -65,12 +65,12 @@ To reproduce the benchmark, you can execute file [nano_vs_others.py](benchmarks/
 |    | technology       |   duration_sec |   factor |
 |---:|:-----------------|---------------:|---------:|
 |  0 | NanoCube         |          0.016 |    1     |
-|  1 | SQLite (indexed) |          0.133 |    8.312 |
-|  2 | Polars           |          0.534 |   33.375 |
-|  3 | Arrow            |          1.933 |  120.812 |
-|  4 | DuckDB           |          4.171 |  260.688 |
-|  5 | SQLite           |         12.452 |  778.25  |
-|  6 | Pandas           |         36.457 | 2278.56  |
+|  1 | SQLite (indexed) |          0.137 |    8.562 |
+|  2 | Polars           |          0.533 |   33.312 |
+|  3 | Arrow            |          1.941 |  121.312 |
+|  4 | DuckDB           |          4.173 |  260.812 |
+|  5 | SQLite           |         12.565 |  785.312 |
+|  6 | Pandas           |         37.557 | 2347.31  |
 
 
 ### How is this possible?
